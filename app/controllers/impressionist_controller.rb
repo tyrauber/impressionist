@@ -73,7 +73,10 @@ module ImpressionistController
         :ip_address => request.remote_ip,
         :referrer => request.referer
       )
-      query_params.merge!(:params => params) if !!(Impressionist.hstore)
+      if !!(Impressionist.hstore)
+        query_params.merge!(:params => params)
+        query_params.merge!(:session => session.except("session_id", "_csrf_token", "flash"))
+      end
       query_params
     end
 

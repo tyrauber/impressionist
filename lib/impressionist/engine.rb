@@ -22,11 +22,15 @@ module Impressionist
       Impression.class_eval do
         if !!(Impressionist.hstore)
           serialize :params, ActiveRecord::Coders::Hstore
-          scope :with, lambda {|key, value=nil|
-            where("params"+(value.nil? ? " ? '"+key+"'" : " @> '"+key+" => "+value+"'")) if self.hstore_enabled?
+          serialize :session, ActiveRecord::Coders::Hstore
+          scope :with_param, lambda {|key, value=nil|
+            where("params"+(value.nil? ? " ? '"+key+"'" : " @> '"+key+" => "+value+"'"))
+          }
+          scope :with_session, lambda {|key, value=nil|
+            where("session"+(value.nil? ? " ? '"+key+"'" : " @> '"+key+" => "+value+"'"))
           }
         else
-          attr_accessor :params
+          attr_accessor :params, :session
         end
       end
     end
