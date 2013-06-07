@@ -75,7 +75,7 @@ module ImpressionistController
       )
       if !!(Impressionist.hstore)
         query_params.merge!(:params => params)
-        query_params.merge!(:session => session.except("session_id", "_csrf_token", "flash"))
+        query_params.merge!(:session => request.session_options.except("session_id", "_csrf_token", "flash"))
       end
       query_params
     end

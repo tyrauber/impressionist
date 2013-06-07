@@ -23,14 +23,13 @@ module Impressionist
         if !!(Impressionist.hstore)
           serialize :params, ActiveRecord::Coders::Hstore
           serialize :session, ActiveRecord::Coders::Hstore
+          attr_accessible :params, :session
           scope :with_param, lambda {|key, value=nil|
             where("params"+(value.nil? ? " ? '"+key+"'" : " @> '"+key+" => "+value+"'"))
           }
           scope :with_session, lambda {|key, value=nil|
             where("session"+(value.nil? ? " ? '"+key+"'" : " @> '"+key+" => "+value+"'"))
           }
-        else
-          attr_accessor :params, :session
         end
       end
     end
