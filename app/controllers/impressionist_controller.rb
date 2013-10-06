@@ -64,14 +64,24 @@ module ImpressionistController
 
     # creates a statment hash that contains default values for creating an impression via an AR relation.
     def associative_create_statement(query_params={})
+      ua = UserAgent.parse(request.env["HTTP_USER_AGENT"])
       query_params = query_params.merge!(
         :controller_name => controller_name,
         :action_name => action_name,
         :user_id => user_id,
         :request_hash => @impressionist_hash,
         :session_hash => session_hash,
+        :url => request.fullpath,
         :ip_address => request.remote_ip,
-        :referrer => request.referer
+        :referrer => request.referer,
+        :format => request.format.to_s,
+        :method => request.method.to_s,
+        :application => ua.application.to_s,
+        :browser => ua.browser.to_s,
+        :version => ua.version.to_s,
+        :platform => ua.platform.to_s,
+        :mobile => ua.mobile?,
+        :os => ua.os.to_s
       )
       if !!(Impressionist.hstore)
         query_params.merge!(:params => params)
@@ -82,10 +92,18 @@ module ImpressionistController
 
     # creates a statment hash that contains default values for creating an impression.
     def direct_create_statement(query_params={})
-      query_params.reverse_merge!(
-        :impressionable_type => controller_name.singularize.camelize,
-        :impressionable_id=> params[:id]
+      resource = controller_name.singularize.camelize.constantize.find(params[:id]) rescue false
+      if resource
+        query_params.reverse_merge!(
+          :impressionable_type => controller_name.singularize.camelize,
+          :impressionable_id=> resource.id
         )
+      else
+        query_params.reverse_merge!(
+          :impressionable_type => resource.class.name,
+          :impressionable_id=> params[:id]
+        )
+      end
       associative_create_statement(query_params)
     end
 

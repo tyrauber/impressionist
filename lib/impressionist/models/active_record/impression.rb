@@ -1,7 +1,8 @@
 class Impression < ActiveRecord::Base
   attr_accessible :impressionable_type, :impressionable_id, :user_id,
   :controller_name, :action_name, :view_name, :request_hash, :ip_address,
-  :session_hash, :message, :referrer
+  :session_hash, :message, :referrer, :application, :browser, :version,
+  :platform, :mobile, :os, :url, :format, :method
 
   belongs_to :impressionable, :polymorphic=>true
 
